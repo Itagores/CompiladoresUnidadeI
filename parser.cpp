@@ -60,11 +60,12 @@ void Parser::program(){
 	lookahead = lexer.Scan();
 	Id * id = (Id*)lookahead;
 	cout << "(" << id->tag << "," << id->name << ")";
+	lookahead = lexer.Scan();
 	block();
 
 }
 void Parser::block(){
-	lookahead = lexer.Scan();
+	//lookahead = lexer.Scan();
 	//match '{'
 	if (lookahead->tag == '{'){
 		cout << '{';
@@ -145,7 +146,7 @@ void Parser::term(){
 	}
 }
 void Parser::factor(){
-	Token * lookahead = lexer.Scan();
+	//Token * lookahead = lexer.Scan();
 	
 	switch (lookahead->tag)
 	{
@@ -161,6 +162,7 @@ void Parser::factor(){
 		}
 			
 		default:
+			cout << lookahead->tag;
 			break;
 	}
 }

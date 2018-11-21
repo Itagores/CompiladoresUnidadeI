@@ -65,6 +65,7 @@ Token * Lexer::Scan()
 		// se o lexema já está na tabela
 		if (pos != id_table.end())
 		{
+			//cout << pos->second.name;
 			TRepository.i = pos->second;
 			return & TRepository.i;
 		}
@@ -81,6 +82,7 @@ Token * Lexer::Scan()
 			the_file.get(peek);
 		}
 		string sname = name.str();
+		//cout << "S: "<<sname;
 
 		// retorna o token ID
 		if(s.compare("int")){
