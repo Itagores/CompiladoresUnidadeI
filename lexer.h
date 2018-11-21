@@ -7,7 +7,7 @@ using std::ifstream;
 
 // cada token deve possuir uma tag (número a partir de 256)
 // a tag dos caracteres individuais é seu código ASCII
-enum Tag { NUM = 256, ID, EXPRESSION,TRUE, FALSE };
+enum Tag { NUM = 256, EXPRESSION, INT, FLOAT, TRUE, FALSE };
 
 // classes para representar tokens
 struct Token
@@ -29,15 +29,23 @@ struct Id : public Token
 	Id(int t, string s) : Token(t), name(s) {}
 };
 
-
 // analisador léxico
 class Lexer
 {
 private:
+	// classe para conter o token gerado
+	struct Repository
+	{
+		Token t {0};
+		Num n {0};
+		Id i {Tag::EXPRESSION," "};
+	} TRepository;
+
 	ifstream the_file;
 	int  line = 1;
 	char peek = ' ';
 	unordered_map<string, Id> id_table;
+	
 
 public:
 	Lexer();

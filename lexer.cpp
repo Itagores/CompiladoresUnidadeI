@@ -11,11 +11,18 @@ Lexer::Lexer()
     // insere as palavras-reservadas na tabela de id's
 	id_table["true"] = Id{ Tag::TRUE, "true" };
 	id_table["false"] = Id{ Tag::FALSE, "false" };
+	id_table["expression"] = Id{ Tag::EXPRESSION, "expression"};
+	id_table["float"] = Id{Tag::FLOAT, "expression"};
+	id_table["int"] = Id{Tag::INT, "int"};
 }
 
 // retorna tokens para o analisador sintático
 Token * Lexer::Scan()
 {
+	//se final do arquivo
+	if(the_file.eof())
+		return nullptr; 
+
 	//espaços em branco e comentários
 	ignore();
 	
@@ -35,9 +42,8 @@ Token * Lexer::Scan()
 		while (isdigit(peek));
 
 		// retorna o token NUM
-		Num resp = Num{v};
-		cout <<  '(' << resp.tag << ',' << resp.value << ')';
-		return & resp;
+		TRepository.n = Num{v};
+		return & TRepository.n;
 	}
 		
 	// retorna palavras-chave e identificadores
@@ -59,25 +65,47 @@ Token * Lexer::Scan()
 		// se o lexema já está na tabela
 		if (pos != id_table.end())
 		{
-			return & pos->second;
+			TRepository.i = pos->second;
+			return & TRepository.i;
 		}
 
 		// se o lexema ainda não está na tabela
-		Id new_id {Tag::ID, s};
-		id_table[s] = new_id;
+		stringstream name;
+		//ignora espaços ate encontrar o nome da variável
+		while(isspace(peek))
+			the_file.get(peek);
+		
+		//pega o nome da variável
+		while(!isspace(peek) && peek != ';'){
+			name << peek;
+			the_file.get(peek);
+		}
+		string sname = name.str();
 
 		// retorna o token ID
-		cout << "(" << new_id.tag << ',' << new_id.name << ")";
-		return & new_id;
+		if(s.compare("int")){
+			Id new_id {Tag::INT, sname};
+			id_table[sname] = new_id;
+			TRepository.i = new_id;
+			return & TRepository.i;
+		}else if(s.compare("float")){
+			Id new_id {Tag::FLOAT, sname};
+			id_table[sname] = new_id;
+			TRepository.i = new_id;
+			return & TRepository.i;
+		}
+
+		
 	}
 	
 	// operadores (e caracteres não alphanuméricos isolados)
-		cout << '('<< peek << ')';
-		Token t {peek};
-		peek = ' ';
+	//cout << '('<< peek << ')';
+	Token t {peek};
+	TRepository.t = t;
+	peek = ' ';
 
-		// retorna o token para o caractere isolado
-		return &t;
+	// retorna o token para o caractere isolado
+	return & TRepository.t;
 	
 	
 }
@@ -94,10 +122,15 @@ void Lexer::Start(string file)
 
 void Lexer::ignore(){
 
-	while(true){
-		return & new_id;
+	
+	while(isspace(peek)){
+		the_file.get(peek);
+	}
 
-		//cout << "comentario eliminado";
+	while(true){
+
+		if(peek == '{')
+			return;
 
 		if(isalpha(peek))
 			break;
@@ -120,62 +153,6 @@ void Lexer::ignore(){
 
 	the_file.get(peek);
 
-}
-
-Num* Lexer::isNum(){
-
-	if (isdigit(peek))
-	{
-		int v = 0;
-		
-		do 
-		{
-			// converte 'n' para o dígito numérico n
-			int n = peek - '0';
-			v = 10 * v + n;
-			//peek = cin.get(); // ler do terminal
-			the_file.get(peek); // ler do arquivo
-		} 
-		while (isdigit(peek));
-
-		// retorna o token NUM
-		Num resp = Num{v};
-		cout <<  '(' << resp.tag << ',' << resp.value << ')';
-		return & resp;
-	}else return nullptr;
-}
-
-Id* Lexer::isId(){
-
-	if (isalpha(peek))
-	{
-		stringstream ss;
-
-		do 
-		{
-			ss << peek;
-			//peek = cin.get(); // ler do terminal
-			the_file.get(peek); // ler do arquivo
-		} 
-		while (isalpha(peek));
-
-		string s = ss.str();
-		auto pos = id_table.find(s);
-
-		// se o lexema já está na tabela
-		if (pos != id_table.end())
-		{
-			return & pos->second;
-		}
-
-		// se o lexema ainda não está na tabela
-		Id new_id {Tag::ID, s};
-		id_table[s] = new_id;
-
-		// retorna o token ID
-		cout << "(" << new_id.tag << ',' << new_id.name << ")";
-		return & new_id;
-	}else return nullptr;
 }
 
 

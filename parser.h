@@ -22,6 +22,7 @@ private:
 	void term();
 	void factor();
 	void match(int tag);
+	void match(char t);
 		
 	//void Expr();
 	//void Term();
